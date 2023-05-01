@@ -34,7 +34,7 @@ exports.getSqlConnection = () => {
       );
     });
 
-    // initializing models here
+    // Initializing models here
     const models = fs.readdirSync(MODEL_PATH);
     const dbModels = [];
     models.forEach((model) => {
@@ -57,9 +57,13 @@ exports.getSqlConnection = () => {
     for (let databaseInstance in databaseInstances) {
       databaseInstances[databaseInstance]
         .authenticate()
-        .then(() => {})
+        .then(() => {
+          console.log(`connected with database ${databaseInstance}`);
+        })
         .catch((error) => {
-          console.log('error occured in connecting with database: ', error);
+          console.log(
+            `error occured in connecting with database ${databaseInstance}: ${error}`
+          );
         });
     }
     return databaseInstances;

@@ -11,9 +11,14 @@ const scheduler = require('./services/scheduler.js');
 // Database connections
 global.databaseInstances = getSqlConnection();
 
-// Creating tempFiles folder to store files
-if (!fs.existsSync('./tempFiles')) {
-  fs.mkdirSync('./tempFiles');
+// Creating ftpLocalFiles folder to store files
+if (!fs.existsSync('./ftpLocalFiles')) {
+  fs.mkdirSync('./ftpLocalFiles');
+}
+
+// Creating ftpRemoteFiles folder
+if (!fs.existsSync('./ftpRemoteFiles')) {
+  fs.mkdirSync('./ftpRemoteFiles');
 }
 
 // Running scheduler

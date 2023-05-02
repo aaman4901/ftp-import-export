@@ -1,24 +1,30 @@
 const path = require('path');
 const fs = require('fs');
 const ftp = require('./ftp');
+const csv = require('csvtojson');
 
-const FTP_LOCAL_PATH = path.resolve(__dirname + '/../tempFiles');
-const FTP_REMOTE_PATH = 'dealers';
+const FTP_LOCAL_PATH = path.join(__dirname + '/../ftpLocalFiles');
+const FTP_REMOTE_PATH = 'ftpRemoteFiles';
+const FTP_FILE_NAME = 'dealers.csv';
 
 exports.import = async () => {
   try {
-    // downloading and storing into local path
+    // Downloading and storing into local path
     await ftp.downloadFileFromFTP(FTP_LOCAL_PATH, FTP_REMOTE_PATH);
 
-    // read files and perform operations like split('=')
-    const files = fs.readdirSync(FTP_LOCAL_PATH);
-    console.log(files);
+    // Reading files and performing operations like split('=')
+    const dealerFilePath = `${FTP_LOCAL_PATH}/${FTP_FILE_NAME}`;
+    const dealersData = await csv().fromFile(dealerFilePath);
+    console.log(dealersData);
 
-    // insert data to database
-    let records = await databaseInstances.dms1.test1.findAll();
-    let records2 = await databaseInstances.dms2.test1.findAll();
-    console.log(records);
-    console.log(records2);
+    // Inserting data to database
+    let dealers = await databaseInstances.dms1.dealers.bulkCreate(dealersData, {
+      updateOnDuplicate: ['name', 'email', 'pan_number', 'city', 'address']
+    });
+    console.log(dealers);
+
+    // Removing excel file from server storage
+    // fs.unlinkSync(dealerFilePath);
   } catch (error) {
     console.log(error);
   }

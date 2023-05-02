@@ -23,6 +23,27 @@ exports.getSqlConnection = () => {
           //   ssl: true,
           //   native: true
           // },
+          hooks: {
+            beforeCreate(rec, opts) {
+              let creationDate = new Date();
+              rec.dataValues.created_at = creationDate;
+              rec.dataValues.updated_at = creationDate;
+            },
+            beforeUpdate(rec, options) {
+              rec.dataValues.updated_at = new Date();
+            },
+            beforeBulkCreate(rec, opts) {
+              let creationDate = new Date();
+              for (let i in rec) {
+                rec[i].created_at = creationDate;
+                rec[i].updated_at = creationDate;
+              }
+            },
+            beforeBulkUpdate(rec, options) {
+              rec.attributes.updated_at = new Date();
+              rec.fields.push('updated_at');
+            }
+          },
           benchmark: false,
           pool: {
             max: 5,
@@ -58,6 +79,7 @@ exports.getSqlConnection = () => {
       databaseInstances[databaseInstance]
         .authenticate()
         .then(() => {
+          // databaseInstances[databaseInstance].sync();
           console.log(`connected with database ${databaseInstance}`);
         })
         .catch((error) => {
